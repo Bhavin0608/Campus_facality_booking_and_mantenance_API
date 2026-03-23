@@ -29,18 +29,21 @@ public class MaintenanceTicket {
     @Column(nullable = false)
     private TicketStatus status = TicketStatus.OPEN;
 
-    @Column(nullable = false, name = "facility_id")
-    private int facilityId;
-
-    @Column(nullable = false, name = "reported_by")
-    private int reportedBy;
-
-    @Column(nullable = false, name = "assigned_to")
-    private int assignedTo;
-
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
     @Column(nullable = true) // if work is not done then it can be null
     private LocalDateTime resolvedAt;
+
+    //RELATION-SHIPS
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private Facility facility;
+
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private User reportedByUser;
+
+    @ManyToOne
+    private User assignedToUser;
 }

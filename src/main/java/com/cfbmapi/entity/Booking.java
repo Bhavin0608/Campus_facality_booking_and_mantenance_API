@@ -33,12 +33,6 @@ public class Booking {
     @Column(nullable = false)
     private BookingStatus status = BookingStatus.PENDING;
 
-    @Column(nullable = false, name = "user_id")
-    private int userId;
-
-    @Column(nullable = false, name = "facility_id")
-    private int facilityId;
-
     @Column(nullable = false)
     @Setter(AccessLevel.NONE)
     private LocalDateTime createdAt;
@@ -47,4 +41,13 @@ public class Booking {
     public void setCreatedAt(){
         this.createdAt = LocalDateTime.now();
     }
+
+    //RELATION-SHIPS
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private User user;
+
+    @ManyToOne
+    @JoinColumn(nullable = false)
+    private Facility facility;
 }

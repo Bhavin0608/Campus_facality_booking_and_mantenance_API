@@ -3,6 +3,8 @@ package com.cfbmapi.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "facilities")
 @Data
@@ -28,4 +30,11 @@ public class Facility {
 
     @Column(nullable = false)
     private FacilityStatus status = FacilityStatus.AVAILABLE;
+
+    //RELATION-SHIPS
+    @OneToMany(mappedBy = "facility", cascade = CascadeType.ALL) // One facility have many bookings
+    private List<Booking> bookings;
+
+    @OneToMany(mappedBy = "facility", cascade = CascadeType.ALL) // One User can have many maintenance tickets
+    private List<MaintenanceTicket> tickets;
 }
