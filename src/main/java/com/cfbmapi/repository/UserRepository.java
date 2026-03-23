@@ -9,7 +9,7 @@ import java.util.List;
 public interface UserRepository extends JpaRepository<User,Integer> {
 
     User findByEmail(String email);
-    List<User> findByRole(UserRole role);
+    List<User> findAllByRole(UserRole role);
     boolean existsByEmail(String email);
 
 }
