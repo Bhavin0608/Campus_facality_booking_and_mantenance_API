@@ -29,7 +29,7 @@ public class User {
     private UserRole role;
 
     @Column
-    private boolean active;
+    private boolean active = true;
 
     @Column
     @Setter(AccessLevel.NONE) // No setter method for this field
