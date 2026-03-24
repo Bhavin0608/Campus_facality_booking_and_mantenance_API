@@ -12,5 +12,5 @@ public interface FacilityRepository extends JpaRepository<Facility,Integer> {
     List<Facility> findAllByType(FacilityType type);
     List<Facility> findAllByStatus(FacilityStatus status);
     List<Facility> findByLocation(String location);
-
+    boolean existsByNameAndLocation(String name, String location);
 }

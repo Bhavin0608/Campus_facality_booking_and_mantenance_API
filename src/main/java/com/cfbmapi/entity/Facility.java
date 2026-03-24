@@ -28,6 +28,7 @@ public class Facility {
     @Column(nullable = false)
     private String location;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private FacilityStatus status = FacilityStatus.AVAILABLE;
 
