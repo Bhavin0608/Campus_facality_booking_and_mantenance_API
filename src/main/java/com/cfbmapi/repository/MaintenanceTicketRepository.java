@@ -6,10 +6,10 @@ import java.util.List;
 
 public interface MaintenanceTicketRepository extends JpaRepository<MaintenanceTicket,Integer> {
 
-    List<MaintenanceTicket> findAllByFacility(Facility facility);
+    List<MaintenanceTicket> findAllByFacility_Id(int facilityId);
     List<MaintenanceTicket> findAllByStatus(TicketStatus status);
-    List<MaintenanceTicket> findAllByAssignedToUser(User assignedToUser);
-    List<MaintenanceTicket> findAllByReportedByUser(User reportedByUser);
+    List<MaintenanceTicket> findByAssignedToUser_Id(int userId);
+    List<MaintenanceTicket> findByReportedByUser_Id(int UserId);
     List<MaintenanceTicket> findAllByPriority(TicketPriority priority);
 
 }
