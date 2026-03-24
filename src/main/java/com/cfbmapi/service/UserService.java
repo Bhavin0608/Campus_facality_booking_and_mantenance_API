@@ -1,5 +1,7 @@
 package com.cfbmapi.service;
 
+import com.cfbmapi.dto.UserRegisterRequest;
+import com.cfbmapi.dto.UserUpdateRequest;
 import com.cfbmapi.entity.User;
 import com.cfbmapi.entity.UserRole;
 import com.cfbmapi.repository.UserRepository;
@@ -8,25 +10,23 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository; // using lombok dependency is injected through constructor
     private final BCryptPasswordEncoder passwordEncoder;
 
-    public User registerUser(String name, String email, String password, UserRole role){
+    public User registerUser(UserRegisterRequest request){ // only required field are entered using 'dto'
 
         try{
-            if(userRepository.existsByEmail(email))
+            if(userRepository.existsByEmail(request.getEmail()))
                 throw new RuntimeException("Email already exits");
 
             User user = new User();
-            user.setName(name);
-            user.setEmail(email);
-            user.setPassword(passwordEncoder.encode(password));
-            user.setRole(role);
+            user.setName(request.getName());
+            user.setEmail(request.getEmail());
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+            user.setRole(request.getRole());
 
             return userRepository.save(user);
         }catch(Exception e){
@@ -46,15 +46,18 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public void updateUser(int id, User updatedUserDetails){
+    public void updateUser(int id, UserUpdateRequest updatedUserDetails){ // only UserUpdateRequest fields are allowed here using 'dto'
         try{
             User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User with id "+id+" doesn't exists"));
 
-            if(updatedUserDetails.getName() != null)
+            if(updatedUserDetails.getName() != null && !updatedUserDetails.getName().isBlank())
                 user.setName(updatedUserDetails.getName());
 
-            if(updatedUserDetails.getEmail() != null)
+            if(updatedUserDetails.getEmail() != null && !updatedUserDetails.getEmail().isBlank()){
+                if(userRepository.existsByEmail(updatedUserDetails.getEmail()))
+                    throw new RuntimeException("This Email is already exists");
                 user.setEmail(updatedUserDetails.getEmail());
+            }
 
             userRepository.save(user);
             System.out.println("User is Updated successfully...");
@@ -65,8 +68,6 @@ public class UserService {
 
     public void deleteUser(int id){
         try{
-            User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("Such User with id "+id+" not exists."));
-
             userRepository.deleteById(id);
             System.out.println("User is Successfully deleted...");
         }catch (Exception e){
