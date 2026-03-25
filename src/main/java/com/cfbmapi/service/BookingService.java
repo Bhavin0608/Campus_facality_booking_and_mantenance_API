@@ -1,5 +1,6 @@
 package com.cfbmapi.service;
 
+import com.cfbmapi.dto.BookingUpdateRequest;
 import com.cfbmapi.entity.Booking;
 import com.cfbmapi.entity.BookingStatus;
 import com.cfbmapi.entity.Facility;
@@ -20,7 +21,7 @@ public class BookingService {
     private final FacilityRepository facilityRepository;
     private final UserRepository userRepository;
 
-    // Create booking with conflict check
+    //------------------- Create booking with conflict check -------------------------
     public Booking createBooking(int userId, int facilityId, LocalDate date,
                                  LocalTime startTime, LocalTime endTime, String purpose) {
         try {
@@ -53,52 +54,31 @@ public class BookingService {
         }
     }
 
-    // Get booking by ID
-    public Booking getBookingById(int id) {
-        return bookingRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Booking not found"));
-    }
-
-    // Get all bookings
-    public List<Booking> getAllBookings() {
-        return bookingRepository.findAll();
-    }
-
-    // Get all bookings for a user
-    public List<Booking> getUserBookings(int userId) {
-        return bookingRepository.findAllByUser_Id(userId);
-    }
-
-    // Get all bookings for a facility
-    public List<Booking> getFacilityBookings(int facilityId) {
-        return bookingRepository.findAllByFacility_Id(facilityId);
-    }
-
-    // Get bookings by status
-    public List<Booking> getBookingsByStatus(BookingStatus status) {
-        return bookingRepository.findAllByStatus(status);
-    }
-
-    // Check if time slot is available (important for conflict checking)
-    public boolean isTimeSlotAvailable(int facilityId, LocalDate date,
-                                       LocalTime startTime, LocalTime endTime) {
+    //------------------------------ Update booking --------------------------------
+    public Booking updateBooking(int id, BookingUpdateRequest bookingDetails) {
         try {
-            List<Booking> bookings = bookingRepository.findByFacility_IdAndBookingDate(facilityId, date);
+            Booking booking = getBookingById(id);
 
-            for (Booking booking : bookings) {
-                if (booking.getStatus() == BookingStatus.APPROVED) {// Only check approved bookings
-                    if (!(endTime.isBefore(booking.getStartTime()) || startTime.isAfter(booking.getEndTime()))) {// Check for time overlap
-                        return false; // Conflict found
-                    }
-                }
+            if (bookingDetails.getDate() != null) {
+                booking.setBookingDate(bookingDetails.getDate());
             }
-            return true; // No conflicts
+            if (bookingDetails.getStartTime() != null) {
+                booking.setStartTime(bookingDetails.getStartTime());
+            }
+            if (bookingDetails.getEndTime() != null) {
+                booking.setEndTime(bookingDetails.getEndTime());
+            }
+            if (bookingDetails.getPurpose() != null) {
+                booking.setPurpose(bookingDetails.getPurpose());
+            }
+
+            return bookingRepository.save(booking);
         } catch (Exception e) {
-            throw new RuntimeException("Error checking availability: " + e.getMessage());
+            throw new RuntimeException("Error updating booking: " + e.getMessage());
         }
     }
 
-    // Approve booking (Admin only)
+    //--------------------- Approve booking (Admin only) --------------------------
     public Booking approveBooking(int id) {
         try {
             Booking booking = getBookingById(id);
@@ -131,27 +111,48 @@ public class BookingService {
         }
     }
 
-    // Update booking
-    public Booking updateBooking(int id, Booking bookingDetails) {
+    //------------------------- Get booking by ID --------------------------------
+    public Booking getBookingById(int id) {
+        return bookingRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+    }
+
+    // Get all bookings
+    public List<Booking> getAllBookings() {
+        return bookingRepository.findAll();
+    }
+
+    // Get all bookings for a user
+    public List<Booking> getUserBookings(int userId) {
+        return bookingRepository.findAllByUser_Id(userId);
+    }
+
+    // Get all bookings for a facility
+    public List<Booking> getFacilityBookings(int facilityId) {
+        return bookingRepository.findAllByFacility_Id(facilityId);
+    }
+
+    // Get bookings by status
+    public List<Booking> getBookingsByStatus(BookingStatus status) {
+        return bookingRepository.findAllByStatus(status);
+    }
+
+    //------- Check if time slot is available (important for conflict checking) --------
+    public boolean isTimeSlotAvailable(int facilityId, LocalDate date,
+                                       LocalTime startTime, LocalTime endTime) {
         try {
-            Booking booking = getBookingById(id);
+            List<Booking> bookings = bookingRepository.findByFacility_IdAndBookingDate(facilityId, date);
 
-            if (bookingDetails.getBookingDate() != null) {
-                booking.setBookingDate(bookingDetails.getBookingDate());
+            for (Booking booking : bookings) {
+                if (booking.getStatus() == BookingStatus.APPROVED) {// Only check approved bookings
+                    if (!(endTime.isBefore(booking.getStartTime()) || startTime.isAfter(booking.getEndTime()))) {// Check for time overlap
+                        return false; // Conflict found
+                    }
+                }
             }
-            if (bookingDetails.getStartTime() != null) {
-                booking.setStartTime(bookingDetails.getStartTime());
-            }
-            if (bookingDetails.getEndTime() != null) {
-                booking.setEndTime(bookingDetails.getEndTime());
-            }
-            if (bookingDetails.getPurpose() != null) {
-                booking.setPurpose(bookingDetails.getPurpose());
-            }
-
-            return bookingRepository.save(booking);
+            return true; // No conflicts
         } catch (Exception e) {
-            throw new RuntimeException("Error updating booking: " + e.getMessage());
+            throw new RuntimeException("Error checking availability: " + e.getMessage());
         }
     }
 }
