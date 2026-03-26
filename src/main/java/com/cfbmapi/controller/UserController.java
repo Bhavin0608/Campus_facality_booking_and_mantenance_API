@@ -9,6 +9,8 @@ import com.cfbmapi.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +23,7 @@ public class UserController {
 
     //Get All User
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getAllUsers(){
         try{
             List<User> users = userService.getAllUser();
@@ -32,9 +35,12 @@ public class UserController {
 
     //Get User By ID
     @GetMapping("/{id}")
-    public ResponseEntity<?> getUserById(@PathVariable int id){
+    @PreAuthorize("hasAnyRole('ADMIN','STAFF','STUDENT')")
+    public ResponseEntity<?> getUserById(@PathVariable int id, Authentication auth){
         try{
             User user = userService.getUserById(id);
+            if(!user.getEmail().equals(auth.getName()))
+                return ResponseEntity.badRequest().body("Access Denied");
             return ResponseEntity.ok(user);
         }catch(Exception e){
             return ResponseEntity.badRequest().body("Error : "+e.getMessage());
@@ -55,8 +61,11 @@ public class UserController {
 
     //Get User By Email
     @GetMapping("/email/{email}")
-    public ResponseEntity<?> getUserByEmail(@PathVariable String email){
+    @PreAuthorize("hasAnyRole('ADMIN','STAFF','STUDENT')")
+    public ResponseEntity<?> getUserByEmail(@PathVariable String email, Authentication auth){
         try{
+            if(!email.equals(auth.getName()))
+                return ResponseEntity.badRequest().body("Access Denied");
             User user = userService.getUserByEmail(email);
             return ResponseEntity.ok(user);
         }catch(Exception e){
@@ -66,6 +75,7 @@ public class UserController {
 
     //Get Users By Roles
     @GetMapping("/roles/{role}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getUsersByRole(@PathVariable UserRole role){
         try{
             List<User> users = userService.getUsersByRole(role);
@@ -77,8 +87,12 @@ public class UserController {
 
     //Update User by ID
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable int id, @RequestBody UserUpdateRequest request){
+    @PreAuthorize("hasAnyRole('ADMIN','STAFF','STUDENT')")
+    public ResponseEntity<?> updateUser(@PathVariable int id, @RequestBody UserUpdateRequest request, Authentication auth){
         try{
+            if(!userService.getUserById(id).getEmail().equals(auth.getName()))
+                return ResponseEntity.badRequest().body("Access Denied");
+
             userService.updateUser(id,request);
             return ResponseEntity.ok(request);
         }catch(Exception e){
@@ -88,6 +102,7 @@ public class UserController {
 
     //Delete User By ID
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteUser(@PathVariable int id){
         try{
             userService.deleteUser(id);
@@ -99,8 +114,12 @@ public class UserController {
 
     //Change-Password
     @PutMapping("/{id}/change-password")
-    public ResponseEntity<?> changeUserPassword(@PathVariable int id, @RequestBody UserChangePasswordRequest request){
+    @PreAuthorize("hasAnyRole('ADMIN','STAFF','STUDENT')")
+    public ResponseEntity<?> changeUserPassword(@PathVariable int id, @RequestBody UserChangePasswordRequest request ,Authentication auth){
         try{
+            if(!userService.getUserById(id).getEmail().equals(auth.getName()))
+                return ResponseEntity.badRequest().body("Access Denied");
+
             userService.changePassword(id,request.getOldPassword(),request.getNewPassword());
             return ResponseEntity.ok("Password changed");
         }catch(Exception e){
