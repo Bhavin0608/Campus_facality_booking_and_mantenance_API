@@ -3,7 +3,6 @@ package com.cfbmapi.controller;
 import com.cfbmapi.dto.FacilityCreateRequest;
 import com.cfbmapi.dto.FacilityStatusRequest;
 import com.cfbmapi.entity.Facility;
-import com.cfbmapi.entity.FacilityStatus;
 import com.cfbmapi.entity.FacilityType;
 import com.cfbmapi.service.FacilityService;
 import lombok.RequiredArgsConstructor;
