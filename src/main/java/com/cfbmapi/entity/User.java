@@ -51,4 +51,15 @@ public class User {
     @OneToMany(mappedBy = "assignedToUser", cascade = CascadeType.ALL) // One staff can be assigned many tickets
     private List<MaintenanceTicket> assignedTickets;
 
+    // toString
+    @Override
+    public String toString(){
+        return "Id : " +getId()+
+                "\nName : " +getName()+
+                "\nEmail : " +getEmail()+
+                "\nPassword : " +getPassword()+
+                "\nisActive : " +active+
+                "\nRole : " +getRole()+
+                "\nCreated At : "+getCreatedAt();
+    }
 }

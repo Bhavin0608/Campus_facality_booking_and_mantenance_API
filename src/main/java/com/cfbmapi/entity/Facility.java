@@ -38,4 +38,15 @@ public class Facility {
 
     @OneToMany(mappedBy = "facility", cascade = CascadeType.ALL) // One User can have many maintenance tickets
     private List<MaintenanceTicket> tickets;
+
+    //to String
+    @Override
+    public String toString(){
+        return "Id : " +getId()+
+                "\nName : " +getName()+
+                "\nType : " +getType()+
+                "\nCapacity : " +getCapacity()+
+                "\nLocation : " +getLocation()+
+                "\nStatus : " +getStatus();
+    }
 }

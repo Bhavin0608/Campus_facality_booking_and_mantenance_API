@@ -50,4 +50,15 @@ public class Booking {
     @ManyToOne
     @JoinColumn(nullable = false)
     private Facility facility;
+
+    @Override
+    public String toString() {
+        return "Id : " +getId()+
+                "\nBooking Date : " +getBookingDate()+
+                "\nStart Time : " +getStartTime()+
+                "\nEnd Time : " +getEndTime()+
+                "\nPurpose : " +getPurpose()+
+                "\nStatus : " +getStatus()+
+                "\nCreated At" +getCreatedAt();
+    }
 }

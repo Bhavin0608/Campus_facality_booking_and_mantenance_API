@@ -17,7 +17,7 @@ public class MaintenanceTicket {
     @Column(nullable = false)
     private String title;
 
-    @Lob
+//    @Lob
     @Column(nullable = false)
     private String description;
 
@@ -30,7 +30,13 @@ public class MaintenanceTicket {
     private TicketStatus status = TicketStatus.OPEN;
 
     @Column(nullable = false)
+    @Setter(AccessLevel.NONE)
     private LocalDateTime createdAt;
+
+    @PrePersist // Set time before saving/persist on database...
+    public void setCreatedAt(){
+        this.createdAt = LocalDateTime.now();
+    }
 
     @Column(nullable = true) // if work is not done then it can be null
     private LocalDateTime resolvedAt;
@@ -46,4 +52,16 @@ public class MaintenanceTicket {
 
     @ManyToOne
     private User assignedToUser;
+
+    //toString
+    @Override
+    public String toString(){
+        return "Id : " +getId()+
+                "\nTitle : " +getTitle()+
+                "\nDescription : " +getDescription()+
+                "\nPriority : " +getPriority()+
+                "\nStatus : " +getStatus()+
+                "\nResolved At : " +getResolvedAt()+
+                "\nCreated At : "+getCreatedAt();
+    }
 }
