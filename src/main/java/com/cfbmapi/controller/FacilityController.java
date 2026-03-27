@@ -1,12 +1,13 @@
 package com.cfbmapi.controller;
 
 import com.cfbmapi.dto.FacilityCreateRequest;
-import com.cfbmapi.dto.FacilityStatusRequest;
 import com.cfbmapi.entity.Facility;
+import com.cfbmapi.entity.FacilityStatus;
 import com.cfbmapi.entity.FacilityType;
 import com.cfbmapi.service.FacilityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class FacilityController {
 
     //--------------------------- Create Facility ------------------------------------
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> createFacility(@RequestBody FacilityCreateRequest request){
         try{
             Facility facility = facilityService.createFacility(request);
@@ -30,6 +32,7 @@ public class FacilityController {
 
     //---------------------------- Update Facility -----------------------------------
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> updateFacility(@PathVariable int id, @RequestBody FacilityCreateRequest request){
         try{
             facilityService.updateFacility(id,request);
@@ -41,10 +44,11 @@ public class FacilityController {
 
     // Update Facility Status
     @PutMapping("/{id}/status")
-    public ResponseEntity<?> updateFacilityStatus(@PathVariable int id, @RequestBody FacilityStatusRequest status){
+    @PreAuthorize("hasRole('STAFF')") // when they look after the maintenance tickets
+    public ResponseEntity<?> updateFacilityStatus(@PathVariable int id, @RequestParam FacilityStatus status){
         try{
-            facilityService.updateFacilityStatus(id,status.getStatus());
-            return ResponseEntity.ok("Status is updated to : "+status.getStatus());
+            facilityService.updateFacilityStatus(id,status);
+            return ResponseEntity.ok("Status is updated to : "+status);
         }catch(Exception e){
             return ResponseEntity.badRequest().body("Error : " +e.getMessage());
         }
@@ -52,6 +56,7 @@ public class FacilityController {
 
     //--------------------------- Delete Facility ------------------------------------
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteFacility(@PathVariable int id){
         try{
             facilityService.deleteFacility(id);
@@ -63,6 +68,7 @@ public class FacilityController {
 
     //---------------------- Get Facility and Various Filters ------------------------
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','STAFF','STUDENT')")
     public ResponseEntity<?> getAllFacilities(){
         try{
             List<Facility> facilities = facilityService.getAllFacilities();
@@ -74,6 +80,7 @@ public class FacilityController {
 
     // Get facility by ID
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getFacilityById(@PathVariable int id){
         try{
             Facility facility = facilityService.getFacilityById(id);
@@ -85,6 +92,7 @@ public class FacilityController {
 
     // Get Facilities by type
     @GetMapping("/type/{type}")
+    @PreAuthorize("hasAnyRole('ADMIN','STAFF','STUDENT')") // Filter Option
     public ResponseEntity<?> getAllFacilities(@PathVariable FacilityType type){
         try{
             List<Facility> facilities = facilityService.getFacilitiesByType(type);
@@ -96,6 +104,7 @@ public class FacilityController {
 
     // Get only Available Facilities
     @GetMapping("/available")
+    @PreAuthorize("hasAnyRole('ADMIN','STAFF','STUDENT')") // Filter option
     public ResponseEntity<?> getAllAvailableFacilities(){
         try{
             List<Facility> facilities = facilityService.getAvailableFacilities();
