@@ -1,5 +1,6 @@
 package com.cfbmapi.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -34,9 +35,11 @@ public class Facility {
 
     //RELATION-SHIPS
     @OneToMany(mappedBy = "facility", cascade = CascadeType.ALL) // One facility have many bookings
+    @JsonIgnore
     private List<Booking> bookings;
 
     @OneToMany(mappedBy = "facility", cascade = CascadeType.ALL) // One User can have many maintenance tickets
+    @JsonIgnore
     private List<MaintenanceTicket> tickets;
 
     //to String
