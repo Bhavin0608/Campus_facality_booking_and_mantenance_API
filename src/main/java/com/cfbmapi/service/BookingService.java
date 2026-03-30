@@ -144,8 +144,8 @@ public class BookingService {
             List<Booking> bookings = bookingRepository.findByFacility_IdAndBookingDate(facilityId, date);
 
             for (Booking booking : bookings) {
-                if (booking.getStatus() == BookingStatus.APPROVED) {// Only check approved bookings
-                    if (!(endTime.isBefore(booking.getStartTime()) || startTime.isAfter(booking.getEndTime()))) {// Check for time overlap
+                if (booking.getStatus() == BookingStatus.APPROVED || booking.getStatus() == BookingStatus.PENDING) {// Only check approved bookings
+                    if (!(endTime.isBefore(booking.getStartTime()) && startTime.isAfter(booking.getEndTime()))) {// Check for time overlap
                         return false; // Conflict found
                     }
                 }

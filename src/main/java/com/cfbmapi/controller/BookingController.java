@@ -5,8 +5,11 @@ import com.cfbmapi.dto.BookingUpdateRequest;
 import com.cfbmapi.entity.Booking;
 import com.cfbmapi.entity.BookingStatus;
 import com.cfbmapi.service.BookingService;
+import com.cfbmapi.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,11 +19,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BookingController {
     private final BookingService bookingService;
+    private final UserService userService;
 
     //----------------------- Create Booking ---------------------------
     @PostMapping
-    public ResponseEntity<?> createBooking(@RequestBody BookingCreateRequest request){
+    @PreAuthorize("hasAnyRole('STUDENT','STAFF')")
+    public ResponseEntity<?> createBooking(@RequestBody BookingCreateRequest request, Authentication auth){
         try{
+            if(!auth.getName().equals(userService.getUserById(request.getUserId()).getEmail()))
+                return ResponseEntity.badRequest().body("Access denied");
             Booking booking = bookingService.createBooking(
                     request.getUserId(),
                     request.getFacilityId(),
@@ -37,6 +44,7 @@ public class BookingController {
 
     //--------------------------- Update Booking ----------------------------
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<?> updateBooking(@PathVariable int id, @RequestBody BookingUpdateRequest request){
         try{
             Booking booking = bookingService.updateBooking(id,request);
@@ -48,6 +56,7 @@ public class BookingController {
 
     // ------------------- Approve Reject and Cancel Booking -----------------
     @PutMapping("/{id}/approve")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> approveBooking(@PathVariable int id){
         try{
             Booking booking = bookingService.approveBooking(id);
@@ -58,6 +67,7 @@ public class BookingController {
     }
 
     @PutMapping("/{id}/reject")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> rejectBooking(@PathVariable int id){
         try{
             Booking booking = bookingService.rejectBooking(id);
@@ -68,6 +78,7 @@ public class BookingController {
     }
 
     @PutMapping("/{id}/cancel")
+    @PreAuthorize("hasAnyRole('STUDENT','STAFF')")
     public ResponseEntity<?> cancelBooking(@PathVariable int id){
         try{
             Booking booking = bookingService.cancelBooking(id);
@@ -79,6 +90,7 @@ public class BookingController {
 
     //--------------------- Get booking Using Various filters ----------------------
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getAllBookings(){
         try{
             List<Booking> bookings = bookingService.getAllBookings();
@@ -89,6 +101,7 @@ public class BookingController {
     }
 
     @GetMapping("{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getBooking(@PathVariable int id){
         try{
             Booking booking = bookingService.getBookingById(id);
@@ -99,8 +112,12 @@ public class BookingController {
     }
 
     @GetMapping("/users/{userId}")
-    public ResponseEntity<?> getUserBookings(@PathVariable int userId){
+    @PreAuthorize("hasAnyRole('STUDENT','STAFF')")
+    public ResponseEntity<?> getUserBookings(@PathVariable int userId, Authentication auth){
         try{
+            if(!auth.getName().equals(userService.getUserById(userId).getEmail()))
+                return ResponseEntity.badRequest().body("Access Denied");
+
             List<Booking> bookings = bookingService.getUserBookings(userId);
             return ResponseEntity.ok(bookings);
         }catch(Exception e){
@@ -109,6 +126,7 @@ public class BookingController {
     }
 
     @GetMapping("/facility/{facilityId}")
+    @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<?> getAllFacilityBookings(@PathVariable int facilityId){
         try{
             List<Booking> bookings = bookingService.getFacilityBookings(facilityId);
@@ -119,6 +137,7 @@ public class BookingController {
     }
 
     @GetMapping("/status/{status}")
+    @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<?> getAllBookingsByStatus(@PathVariable BookingStatus status){
         try{
             List<Booking> bookings = bookingService.getBookingsByStatus(status);

@@ -1,5 +1,6 @@
 package com.cfbmapi.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -45,10 +46,12 @@ public class Booking {
     //RELATION-SHIPS
     @ManyToOne
     @JoinColumn(nullable = false)
+    @JsonIgnore
     private User user;
 
     @ManyToOne
     @JoinColumn(nullable = false)
+    @JsonIgnore
     private Facility facility;
 
     @Override
