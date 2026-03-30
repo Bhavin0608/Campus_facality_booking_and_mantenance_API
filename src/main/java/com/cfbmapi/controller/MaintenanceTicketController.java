@@ -8,6 +8,7 @@ import com.cfbmapi.service.MaintenanceTicketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -19,6 +20,7 @@ public class MaintenanceTicketController {
 
     //--------------------------------- Create ticket -------------------------------------
     @PostMapping
+    @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<?> createTicket(@RequestBody TicketCreateRequest request) {
         try {
             MaintenanceTicket ticket = maintenanceTicketService.createTicket(
@@ -37,6 +39,7 @@ public class MaintenanceTicketController {
 
     //------------------------------- Update ticket status --------------------------------------------
     @PutMapping("/{id}/status")
+    @PreAuthorize("hasRole('STAFF')")
     public ResponseEntity<?> updateTicketStatus(@PathVariable int id,
                                                 @RequestParam TicketStatus status) {
         try {
@@ -50,6 +53,7 @@ public class MaintenanceTicketController {
 
     // Update ticket
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<?> updateTicket(@PathVariable int id,
                                           @RequestBody TicketCreateRequest request) {
         try {
@@ -68,6 +72,7 @@ public class MaintenanceTicketController {
 
     //------------------------------------- Delete ticket ----------------------------------------
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('STAFF')")
     public ResponseEntity<?> deleteTicket(@PathVariable int id) {
         try {
             maintenanceTicketService.deleteTicket(id);
@@ -80,6 +85,7 @@ public class MaintenanceTicketController {
 
     //------------------------------- Get all tickets and its filters -------------------------------------
     @GetMapping
+    @PreAuthorize("hasAnyRole('STAFF','ADMIN')")
     public ResponseEntity<?> getAllTickets() {
         try {
             List<MaintenanceTicket> tickets = maintenanceTicketService.getAllTickets();
@@ -104,6 +110,7 @@ public class MaintenanceTicketController {
 
     // Get tickets by facility
     @GetMapping("/facility/{facilityId}")
+    @PreAuthorize("hasAnyRole('STAFF','ADMIN','STUDENT')")
     public ResponseEntity<?> getTicketsByFacility(@PathVariable int facilityId) {
         try {
             List<MaintenanceTicket> tickets = maintenanceTicketService.getTicketsByFacility(facilityId);
@@ -116,6 +123,7 @@ public class MaintenanceTicketController {
 
     // Get tickets by status
     @GetMapping("/status/{status}")
+    @PreAuthorize("hasAnyRole('STAFF','ADMIN','STUDENT')")
     public ResponseEntity<?> getTicketsByStatus(@PathVariable TicketStatus status) {
         try {
             List<MaintenanceTicket> tickets = maintenanceTicketService.getTicketsByStatus(status);
@@ -128,6 +136,7 @@ public class MaintenanceTicketController {
 
     // Get tickets by priority
     @GetMapping("/priority/{priority}")
+    @PreAuthorize("hasAnyRole('STAFF','ADMIN','STUDENT')")
     public ResponseEntity<?> getTicketsByPriority(@PathVariable TicketPriority priority) {
         try {
             List<MaintenanceTicket> tickets = maintenanceTicketService.getTicketsByPriority(priority);
@@ -164,6 +173,7 @@ public class MaintenanceTicketController {
 
     //------------------------------------ Assign ticket to staff and Resolve -------------------------------------
     @PutMapping("/{id}/assign")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> assignTicket(@PathVariable int id,
                                           @RequestParam int staffUserId) {
         try {
@@ -177,6 +187,7 @@ public class MaintenanceTicketController {
 
     // Resolve ticket
     @PutMapping("/{id}/resolve")
+    @PreAuthorize("hasRole('STAFF')")
     public ResponseEntity<?> resolveTicket(@PathVariable int id) {
         try {
             MaintenanceTicket ticket = maintenanceTicketService.resolveTicket(id);
