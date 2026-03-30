@@ -5,20 +5,21 @@ import com.cfbmapi.dto.LoginResponse;
 import com.cfbmapi.entity.User;
 import com.cfbmapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     // Login user
     public LoginResponse login(LoginRequest request) {
         try {
             // Find user by email
-            User user = userRepository.findByEmail(request.getEmail());
+            User user = userRepository.findByEmail(request.getEmail())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
             // Check if user is active
             if (!user.isActive()) {
