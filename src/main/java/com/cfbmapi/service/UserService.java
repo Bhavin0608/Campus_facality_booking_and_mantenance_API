@@ -8,6 +8,8 @@ import com.cfbmapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 @Service
@@ -16,6 +18,7 @@ public class UserService {
     private final UserRepository userRepository; // using lombok dependency is injected through constructor
     private final BCryptPasswordEncoder passwordEncoder;
 
+    @Transactional
     public User registerUser(UserRegisterRequest request){ // only required field are entered using 'dto'
 
         try{
@@ -46,6 +49,7 @@ public class UserService {
         return userRepository.findAll();
     }
 
+    @Transactional
     public void updateUser(int id, UserUpdateRequest updatedUserDetails){ // only UserUpdateRequest fields are allowed here using 'dto'
         try{
             User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User with id "+id+" doesn't exists"));
@@ -66,6 +70,7 @@ public class UserService {
         }
     }
 
+    @Transactional
     public void deleteUser(int id){
         try{
             userRepository.deleteById(id);
@@ -79,6 +84,7 @@ public class UserService {
         return userRepository.findAllByRole(role);
     }
 
+    @Transactional
     public void changePassword(int id, String oldPassword, String newPassword){
         try{
             User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User with id "+id+" doesn't exists"));

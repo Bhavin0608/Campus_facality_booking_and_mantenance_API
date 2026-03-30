@@ -10,6 +10,8 @@ import com.cfbmapi.repository.FacilityRepository;
 import com.cfbmapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -22,6 +24,7 @@ public class BookingService {
     private final UserRepository userRepository;
 
     //------------------- Create booking with conflict check -------------------------
+    @Transactional
     public Booking createBooking(int userId, int facilityId, LocalDate date,
                                  LocalTime startTime, LocalTime endTime, String purpose) {
         try {
@@ -55,6 +58,7 @@ public class BookingService {
     }
 
     //------------------------------ Update booking --------------------------------
+    @Transactional
     public Booking updateBooking(int id, BookingUpdateRequest bookingDetails) {
         try {
             Booking booking = getBookingById(id);
@@ -79,6 +83,7 @@ public class BookingService {
     }
 
     //--------------------- Approve booking (Admin only) --------------------------
+    @Transactional
     public Booking approveBooking(int id) {
         try {
             Booking booking = getBookingById(id);
@@ -90,6 +95,7 @@ public class BookingService {
     }
 
     // Reject booking (Admin only)
+    @Transactional
     public Booking rejectBooking(int id) {
         try {
             Booking booking = getBookingById(id);
@@ -101,6 +107,7 @@ public class BookingService {
     }
 
     // Cancel booking (User)
+    @Transactional
     public Booking cancelBooking(int id) {
         try {
             Booking booking = getBookingById(id);

@@ -7,6 +7,7 @@ import com.cfbmapi.entity.FacilityType;
 import com.cfbmapi.repository.FacilityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,6 +18,7 @@ public class FacilityService {
     private final FacilityRepository facilityRepository;
 
     //------------------------- Used to Create the Facility ----------------------------
+    @Transactional
     public Facility createFacility(FacilityCreateRequest request){
         try{
             if(facilityRepository.existsByNameAndLocation(request.getName(), request.getLocation()))
@@ -36,6 +38,7 @@ public class FacilityService {
     }
 
     //--------------------------- Used for Update the Facility ---------------------------
+    @Transactional
     public void updateFacility(int id, FacilityCreateRequest updatedFacility){
         try{
             Facility facility = facilityRepository.findById(id).orElseThrow(() -> new RuntimeException("Facility with id "+id+" doesn't exists"));
@@ -59,6 +62,7 @@ public class FacilityService {
         }
     }
 
+    @Transactional
     public void updateFacilityStatus(int id,FacilityStatus status){
         try{
             Facility facility = facilityRepository.findById(id).orElseThrow(() -> new RuntimeException("Such Facility with id "+id+" not exists."));
@@ -76,6 +80,7 @@ public class FacilityService {
     }
 
     //---------------------- Used for Delete the Facility --------------------------
+    @Transactional
     public void deleteFacility(int id){
         try{
             facilityRepository.deleteById(id);

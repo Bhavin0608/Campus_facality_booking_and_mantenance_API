@@ -10,6 +10,8 @@ import com.cfbmapi.repository.FacilityRepository;
 import com.cfbmapi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -21,6 +23,7 @@ public class MaintenanceTicketService {
     private final UserRepository userRepository;
 
     // Create maintenance ticket
+    @Transactional
     public MaintenanceTicket createTicket(String title, String description, TicketPriority priority,
                                           int facilityId, int reportedByUserId) {
         try {
@@ -85,6 +88,7 @@ public class MaintenanceTicketService {
     }
 
     // Assign ticket to staff member
+    @Transactional
     public MaintenanceTicket assignTicket(int ticketId, int staffUserId) {
         try {
             MaintenanceTicket ticket = getTicketById(ticketId);
@@ -102,6 +106,7 @@ public class MaintenanceTicketService {
     }
 
     // Update ticket status
+    @Transactional
     public MaintenanceTicket updateTicketStatus(int id, TicketStatus status) {
         try {
             MaintenanceTicket ticket = getTicketById(id);
@@ -118,6 +123,7 @@ public class MaintenanceTicketService {
     }
 
     // Resolve ticket (mark as resolved and set resolved time)
+    @Transactional
     public MaintenanceTicket resolveTicket(int id) {
         try {
             MaintenanceTicket ticket = getTicketById(id);
@@ -131,6 +137,7 @@ public class MaintenanceTicketService {
     }
 
     // Update ticket details
+    @Transactional
     public MaintenanceTicket updateTicket(int id, MaintenanceTicket ticketDetails) {
         try {
             MaintenanceTicket ticket = getTicketById(id);
@@ -152,6 +159,7 @@ public class MaintenanceTicketService {
     }
 
     // Delete ticket
+    @Transactional
     public void deleteTicket(int id) {
         try {
             maintenanceTicketRepository.deleteById(id);
