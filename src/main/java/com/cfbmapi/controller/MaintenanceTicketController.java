@@ -4,7 +4,9 @@ import com.cfbmapi.dto.TicketCreateRequest;
 import com.cfbmapi.entity.MaintenanceTicket;
 import com.cfbmapi.entity.TicketPriority;
 import com.cfbmapi.entity.TicketStatus;
+import com.cfbmapi.entity.UserRole;
 import com.cfbmapi.service.MaintenanceTicketService;
+import com.cfbmapi.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MaintenanceTicketController {
     private final MaintenanceTicketService maintenanceTicketService;
+    private final UserService userService;
 
     //--------------------------------- Create ticket -------------------------------------
     @PostMapping
@@ -57,6 +60,9 @@ public class MaintenanceTicketController {
     public ResponseEntity<?> updateTicket(@PathVariable int id,
                                           @RequestBody TicketCreateRequest request) {
         try {
+            if(maintenanceTicketService.getTicketById(id).getStatus() == TicketStatus.CLOSED ||
+                    maintenanceTicketService.getTicketById(id).getStatus() == TicketStatus.RESOLVED)
+                return ResponseEntity.badRequest().body("Ticket is not updatable because it is closed or resolved");
             MaintenanceTicket ticket = new MaintenanceTicket();
             ticket.setTitle(request.getTitle());
             ticket.setDescription(request.getDescription());
@@ -151,6 +157,8 @@ public class MaintenanceTicketController {
     @GetMapping("/assigned/{userId}")
     public ResponseEntity<?> getTicketsAssignedToUser(@PathVariable int userId) {
         try {
+            if(userService.getUserById(userId).getRole() != UserRole.STAFF)
+                return ResponseEntity.badRequest().body("User is not a staff");
             List<MaintenanceTicket> tickets = maintenanceTicketService.getTicketsAssignedToUser(userId);
             return ResponseEntity.ok(tickets);
         } catch (Exception e) {
@@ -177,6 +185,8 @@ public class MaintenanceTicketController {
     public ResponseEntity<?> assignTicket(@PathVariable int id,
                                           @RequestParam int staffUserId) {
         try {
+            if(userService.getUserById(staffUserId).getRole() != UserRole.STAFF)
+                return ResponseEntity.badRequest().body("User is not a staff");
             MaintenanceTicket ticket = maintenanceTicketService.assignTicket(id, staffUserId);
             return ResponseEntity.ok(ticket);
         } catch (Exception e) {

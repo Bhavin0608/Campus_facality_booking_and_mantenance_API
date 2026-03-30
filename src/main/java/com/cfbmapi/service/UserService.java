@@ -9,12 +9,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository; // using lombok dependency is injected through constructor
     private final BCryptPasswordEncoder passwordEncoder;
 
@@ -64,7 +66,7 @@ public class UserService {
             }
 
             userRepository.save(user);
-            System.out.println("User is Updated successfully...");
+            logger.info("User updated successfully. User ID: {}", id);
         }catch (Exception e){
             throw new RuntimeException("Error in Updating User " +e.getMessage());
         }
@@ -74,7 +76,7 @@ public class UserService {
     public void deleteUser(int id){
         try{
             userRepository.deleteById(id);
-            System.out.println("User is Successfully deleted...");
+            logger.info("User deleted successfully. User ID: {}", id);
         }catch (Exception e){
             throw new RuntimeException("Error in deleting the User " +e.getMessage());
         }
@@ -97,7 +99,7 @@ public class UserService {
 
             user.setPassword(passwordEncoder.encode(newPassword));
             userRepository.save(user);
-            System.out.println("Password is updated successfully...");
+            logger.info("Password changed successfully for User ID: {}", id);
         }catch (Exception e){
             throw new RuntimeException("Error in Changing Password "+e.getMessage());
         }

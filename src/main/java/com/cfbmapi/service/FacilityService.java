@@ -8,6 +8,8 @@ import com.cfbmapi.repository.FacilityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -15,6 +17,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class FacilityService {
+    private static final Logger logger = LoggerFactory.getLogger(FacilityService.class);
     private final FacilityRepository facilityRepository;
 
     //------------------------- Used to Create the Facility ----------------------------
@@ -56,7 +59,7 @@ public class FacilityService {
                 facility.setLocation(updatedFacility.getLocation());
 
             facilityRepository.save(facility);
-            System.out.println("Facility is updated successfully");
+            logger.info("Facility updated successfully. Facility ID: {}", id);
         }catch (Exception e){
             throw new RuntimeException("Error in updating Facility" +e.getMessage());
         }
@@ -73,7 +76,7 @@ public class FacilityService {
             facility.setStatus(status);
             facilityRepository.save(facility);
 
-            System.out.println("Status is updated Successfully");
+            logger.info("Facility status updated successfully. Facility ID: {}, New Status: {}", id, status);
         }catch (Exception e){
             throw new RuntimeException("Error in updating facility" +e.getMessage());
         }
@@ -84,7 +87,7 @@ public class FacilityService {
     public void deleteFacility(int id){
         try{
             facilityRepository.deleteById(id);
-            System.out.println("Facility is Successfully deleted...");
+            logger.info("Facility deleted successfully. Facility ID: {}", id);
         }catch (Exception e){
             throw new RuntimeException("Error in deleting facility" +e.getMessage());
         }
